@@ -5,7 +5,7 @@ import shutil
 
 from pathlib import Path
 
-SUPPORTED_METHODS = ["INTER_NEAREST", "INTER_AREA", "INTER_CUBIC", "INTER_LANCZOS4"]
+SUPPORTED_METHODS = ["INTER_NEAREST", "INTER_LINEAR", "INTER_AREA", "INTER_CUBIC", "INTER_LANCZOS4"]
 
 # In case that you use any other image, feel free to add it here.
 IMAGES_EXTENSION_SUPPORTED = (".jpg", ".png", ".jpeg")
@@ -31,6 +31,8 @@ def transform_image(image, method, img_width, img_height):
         return cv2.resize(image, dsize=(img_width, img_height),  interpolation=cv2.INTER_CUBIC)
     if method == "INTER_LANCZOS4":
         return cv2.resize(image, dsize=(img_width, img_height),  interpolation=cv2.INTER_LANCZOS4)
+    if method == "INTER_LINEAR":
+        return cv2.resize(image, dsize=(img_width, img_height), interpolation=cv2.INTER_LINEAR)
 
 parser = argparse.ArgumentParser(description="Script that resize images by specificd method while perserving the folder structure")
 parser.add_argument('--path', type=str, help="Full path to the root node where the images are saved")
