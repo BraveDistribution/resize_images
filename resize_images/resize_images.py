@@ -2,13 +2,15 @@ import argparse
 import cv2
 import os
 import shutil
+import numpy as np
+from PIL import Image
 
 from pathlib import Path
 
 SUPPORTED_METHODS = ["INTER_NEAREST", "INTER_LINEAR", "INTER_AREA", "INTER_CUBIC", "INTER_LANCZOS4"]
 
 # In case that you use any other image, feel free to add it here.
-IMAGES_EXTENSION_SUPPORTED = (".jpg", ".png", ".jpeg")
+IMAGES_EXTENSION_SUPPORTED = (".npy", ".jpg", ".png", ".jpeg")
 
 
 def ig_f(directory, files):
@@ -77,9 +79,16 @@ for root, dirs, files in os.walk(dir_path, topdown=False):
         file_name_with_path = root+"/"+file_name 
         if is_image_file(file_name):
             """ Transform and copy the file """
-            img = cv2.imread(file_name_with_path)
+            img = None
+            if file_name.lower().endswith(".npy"):
+                img = np.float32(Image.fromarray((np.load(file_name_with_path) * 255).astype(np.uint8), 'RGB'))
+            else:
+                img = cv2.imread(file_name_with_path)
             img = transform_image(img, method, img_width, img_height)
-            cv2.imwrite(file_name_with_path.replace(dataset_name, dataset_name+"_" + method), img)
+            if file_name.lower().endswith("npy"):
+                cv2.imwrite(file_name_with_path.replace(dataset_name, dataset_name+"_" + method).replace("npy", "png"), img)
+            else:
+                cv2.imwrite(file_name_with_path.replace(dataset_name, dataset_name+"_" + method), img)
         else:
             """ Just copy over the file """    
             shutil.copyfile(file_name_with_path, file_name_with_path.replace(dataset_name, dataset_name+"_" + method))
